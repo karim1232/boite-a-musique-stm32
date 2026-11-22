@@ -1,0 +1,27 @@
+# Documents non publiés (liste de la promo, livret et docs des enseignants, archive en double)
+non_publie/
+
+# Workspace STM32CubeIDE / Eclipse
+.metadata/
+RemoteSystemsTempFiles/
+
+# Build (régénéré par make)
+obj/
+bin/
+Debug/
+Release/
+*.o
+*.d
+*.lst
+*.elf
+*.bin
+*.map
+*.su
+
+# Office (fichiers de verrou)
+~$*
+
+# Système
+Thumbs.db
+desktop.ini
+.DS_Store
