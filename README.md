@@ -1,77 +1,77 @@
-# Boîte à musique sur STM32 Nucleo F446RE
+# Music box on STM32 Nucleo F446RE
 
-Projet de Microcontrôleurs en IESE3 à Polytech Grenoble (2025/2026), groupe 3 « Tidjallarim » : Allan Bamas, Tidjane Clautrier et Karim Glelah.
+Microcontrollers course project, IESE3 at Polytech Grenoble (2025/2026), group 3 "Tidjallarim": Allan Bamas, Tidjane Clautrier and Karim Glelah.
 
-La carte Nucleo F446RE, avec la carte fille du TP, joue des mélodies sur un buzzer en PWM. La LED tricolore change de couleur à chaque note et un potentiomètre règle le volume. Le code est en C et travaille directement sur les registres (framework Polytech, sans HAL).
+The Nucleo F446RE board, with the course's daughter board, plays melodies on a buzzer using PWM. The RGB LED changes color with every note and a potentiometer sets the volume. The code is in C and works directly on the registers (Polytech framework, no HAL).
 
-Documents : [rapport](docs/Rapport_BoiteAMusique.pdf), [diapos](docs/Diapos_BoiteAMusique.pdf), [compte rendu de la séance 1](docs/CR_seance1.pdf).
+Documents (in French): [report](docs/Rapport_BoiteAMusique.pdf), [slides](docs/Diapos_BoiteAMusique.pdf), [session 1 report](docs/CR_seance1.pdf).
 
-## Arborescence du dépôt
+## Repository layout
 
 ```
 .
-├── code/                   projet STM32CubeIDE (Makefile du framework Polytech)
-│   └── src/                sources C (détail plus bas)
+├── code/                   STM32CubeIDE project (Polytech framework Makefile)
+│   └── src/                C sources (details below)
 └── docs/
     ├── Rapport_BoiteAMusique.pdf
     ├── Diapos_BoiteAMusique.pdf
-    ├── CR_seance1.pdf      compte rendu de la séance 1
-    └── reference/          extraits de la documentation ST (RM0390, datasheet STM32F446)
+    ├── CR_seance1.pdf      session 1 report
+    └── reference/          excerpts from the ST documentation (RM0390, STM32F446 datasheet)
 ```
 
-## Compiler et flasher
+## Build and flash
 
-Dans STM32CubeIDE, passer par *File → Import → Existing Projects into Workspace* et choisir `code/`. On peut aussi lancer `make` dans `code/` ; le binaire sort dans `bin/prog.elf`.
+In STM32CubeIDE, use *File → Import → Existing Projects into Workspace* and pick `code/`. You can also run `make` in `code/`; the binary ends up in `bin/prog.elf`.
 
-## Matériel
+## Hardware
 
-| Composant         | Broche         | Rôle                                 |
+| Component         | Pin            | Role                                 |
 |-------------------|----------------|--------------------------------------|
-| Buzzer            | PB9            | sortie PWM (TIM2 CH2 / AF1)          |
-| LED tricolore     | PA8, PA9, PA10 | rouge, vert, bleu                    |
-| Potentiomètre     | ADC            | volume, relu à chaque note           |
-| Bouton rouge PB8  | PB8            | stop et ouverture du menu            |
-| Switch SW1        | PB3            | pause / reprise                      |
-| Switch SW2        | PB4            | chanson suivante                     |
-| Switch SW3        | PB5            | change le tempo (BPM)                |
-| Switch SW4        | PB6            | lecture / stop                       |
+| Buzzer            | PB9            | PWM output (TIM2 CH2 / AF1)          |
+| RGB LED           | PA8, PA9, PA10 | red, green, blue                     |
+| Potentiometer     | ADC            | volume, read again on every note     |
+| Red button PB8    | PB8            | stop and open the menu               |
+| Switch SW1        | PB3            | pause / resume                       |
+| Switch SW2        | PB4            | next song                            |
+| Switch SW3        | PB5            | change the tempo (BPM)               |
+| Switch SW4        | PB6            | play / stop                          |
 
-## Démarrage
+## Getting started
 
-À l'allumage la carte ne joue rien et aucun menu ne s'affiche sur GTKTerm.
+At power-up the board plays nothing and no menu shows up on GTKTerm.
 
-| Action                 | Effet                                                               |
+| Action                 | Effect                                                              |
 |------------------------|---------------------------------------------------------------------|
-| SW4 (PB6)              | lance Frère Jacques en boucle, au tempo conseillé                   |
-| SW4 une deuxième fois  | arrête la lecture                                                   |
-| PB8 (bouton rouge)     | arrête la lecture et ouvre le menu sur GTKTerm                      |
+| SW4 (PB6)              | plays Frère Jacques in a loop at its suggested tempo                |
+| SW4 a second time      | stops playback                                                      |
+| PB8 (red button)       | stops playback and opens the menu on GTKTerm                        |
 
-## Pendant la lecture
+## During playback
 
-| Contrôle          | Action                                                    |
+| Control           | Action                                                    |
 |-------------------|-----------------------------------------------------------|
-| SW1 ON (PB3)      | pause : la musique s'arrête à sa position actuelle        |
-| SW1 OFF (PB3)     | reprise à l'endroit où elle s'était arrêtée               |
-| SW2 (PB4)         | passe tout de suite à la chanson suivante                 |
-| SW3 (PB5)         | fait tourner le tempo : 60, 80, 90, 120, 160 puis 60 BPM  |
-| SW4 (PB6)         | arrête la lecture                                         |
-| Potentiomètre     | règle le volume pendant la lecture                        |
-| PB8               | arrête et revient au menu sur GTKTerm                     |
+| SW1 ON (PB3)      | pause: the music stops at its current position            |
+| SW1 OFF (PB3)     | resume from where it stopped                              |
+| SW2 (PB4)         | skip to the next song right away                          |
+| SW3 (PB5)         | cycle the tempo: 60, 80, 90, 120, 160, then 60 BPM        |
+| SW4 (PB6)         | stop playback                                             |
+| Potentiometer     | adjust the volume while playing                           |
+| PB8               | stop and go back to the menu on GTKTerm                   |
 
-## Les mélodies
+## Melodies
 
-| #  | Titre                  | Tonalité   | Mesure | Tempo conseillé |
+| #  | Title                  | Key        | Time   | Suggested tempo |
 |----|------------------------|------------|--------|-----------------|
-| 1  | Frère Jacques          | Do majeur  | 4/4    | 120 BPM         |
-| 2  | Au Clair de la Lune    | Do majeur  | 4/4    |  80 BPM         |
-| 3  | Happy Birthday         | Sol majeur | 3/4    |  90 BPM         |
-| 4  | Nokia Ringtone         | La majeur  | 4/4    | 120 BPM         |
-| 5  | Twinkle Twinkle        | Do majeur  | 4/4    | 120 BPM         |
-| 6  | Berceuse de Brahms     | Sol majeur | 3/4    |  80 BPM         |
+| 1  | Frère Jacques          | C major    | 4/4    | 120 BPM         |
+| 2  | Au Clair de la Lune    | C major    | 4/4    |  80 BPM         |
+| 3  | Happy Birthday         | G major    | 3/4    |  90 BPM         |
+| 4  | Nokia Ringtone         | A major    | 4/4    | 120 BPM         |
+| 5  | Twinkle Twinkle        | C major    | 4/4    | 120 BPM         |
+| 6  | Brahms' Lullaby        | G major    | 3/4    |  80 BPM         |
 
-## Menu sur le terminal série (GTKTerm / UART)
+## Serial menu (GTKTerm / UART)
 
-Le menu ne s'ouvre qu'avec PB8. Chaque chanson y est affichée avec son tempo conseillé, et si on tape un tempo invalide, c'est ce tempo conseillé qui est utilisé.
+The menu only opens with PB8. Each song is listed with its suggested tempo, and if an invalid tempo is typed, the suggested one is used. The menu text itself is in French:
 
 ```
 ========================================
@@ -100,70 +100,70 @@ Mode de lecture :
   2 - En boucle
 ```
 
-## Organisation du code
+## Code organization
 
 ```
 code/src/
-├── main.c          Point d'entrée : init hardware + boucle principale
-├── player.c/.h     Cœur du lecteur : lecture, menu, actions switches
-├── timer.c/.h      Configuration TIM2 (PWM) et TIM5 (durée des notes)
-├── button.c/.h     GPIO, EXTI, NVIC et handlers IRQ des boutons/switches
-├── note.c/.h       Type note_t, fréquences, calcul ARR du timer
-├── tempo.c/.h      Gestion du BPM et conversion valeurs musicales → ms
-├── melodie.c/.h    Catalogue des 6 mélodies (tableaux de note_t)
-├── led.c/.h        LED tricolore PA8/PA9/PA10
-└── volume.c/.h     Lecture ADC potentiomètre → duty cycle PWM
+├── main.c          entry point: hardware init + main loop
+├── player.c/.h     player core: playback, menu, switch actions
+├── timer.c/.h      TIM2 setup (PWM) and TIM5 (note duration)
+├── button.c/.h     GPIO, EXTI, NVIC and button/switch IRQ handlers
+├── note.c/.h       note_t type, frequencies, timer ARR computation
+├── tempo.c/.h      BPM handling and conversion of note values to ms
+├── melodie.c/.h    the 6 melodies (arrays of note_t)
+├── led.c/.h        RGB LED on PA8/PA9/PA10
+└── volume.c/.h     potentiometer ADC reading → PWM duty cycle
 ```
 
-## Comment ça marche
+## How it works
 
-### Le son (TIM2 et buzzer)
+### Sound (TIM2 and buzzer)
 
-TIM2 tourne en PWM sur le canal CH2, qui sort sur PB9. La fréquence du signal donne la note :
+TIM2 runs in PWM mode on channel CH2, output on PB9. The signal frequency sets the note:
 
 ```
-ARR = (1 000 000 / fréquence_note) - 1
+ARR = (1 000 000 / note_frequency) - 1
 ```
 
-et le rapport cyclique donne le volume :
+and the duty cycle sets the volume:
 
 ```
 CCR2 = ARR / cycle_val
 ```
 
-`cycle_val` est relu sur le potentiomètre (via l'ADC) à la fin de chaque note.
+`cycle_val` is read again from the potentiometer (through the ADC) at the end of each note.
 
-### Le rythme (TIM5 et interruption)
+### Rhythm (TIM5 and interrupt)
 
-TIM5 compte à 1 MHz, donc un tick vaut 1 µs. On charge dans son ARR la durée de la note en cours :
+TIM5 counts at 1 MHz, so one tick is 1 µs. Its ARR is loaded with the duration of the current note:
 
 ```
 TIM5.ARR = tempo_duration_ms(dur) * 1000
 ```
 
-Quand TIM5 déborde, l'interruption `TIM5_Handler()` appelle `player_next_note()`, qui passe à la note suivante.
+When TIM5 overflows, the `TIM5_Handler()` interrupt calls `player_next_note()`, which moves on to the next note.
 
-### Couleur de la LED selon la note
+### LED color per note
 
-Les 7 combinaisons RGB possibles sont toutes utilisées, sur toutes les notes des 6 mélodies (octaves 3, 4 et 5, notes naturelles et dièses).
+All 7 possible RGB combinations are used, across every note of the 6 melodies (octaves 3, 4 and 5, natural notes and sharps).
 
-| Note(s)              | Couleur              |
+| Note(s)              | Color                |
 |----------------------|----------------------|
-| DO  (toutes octaves) | Rouge                |
-| RE  (toutes octaves) | Vert                 |
-| MI  (toutes octaves) | Bleu                 |
-| FA  (toutes octaves) | Jaune  (R + V)       |
-| SOL (toutes octaves) | Magenta (R + B)      |
-| LA  (toutes octaves) | Cyan   (V + B)       |
-| SI  (toutes octaves) | Blanc  (R + V + B)   |
-| CS4, CS5             | Jaune                |
+| C (all octaves)      | Red                  |
+| D (all octaves)      | Green                |
+| E (all octaves)      | Blue                 |
+| F (all octaves)      | Yellow (R + G)       |
+| G (all octaves)      | Magenta (R + B)      |
+| A (all octaves)      | Cyan (G + B)         |
+| B (all octaves)      | White (R + G + B)    |
+| CS4, CS5             | Yellow               |
 | FS4, FS5             | Magenta              |
 | GS4                  | Cyan                 |
-| SILENCE              | Éteinte              |
+| SILENCE              | Off                  |
 
-### Interruptions des boutons
+### Button interrupts
 
-| Broche | EXTI    | IRQ | Handler           |
+| Pin    | EXTI    | IRQ | Handler           |
 |--------|---------|-----|-------------------|
 | PB3    | EXTI3   |  9  | `EXTI3_Handler`   |
 | PB4    | EXTI4   | 10  | `EXTI4_Handler`   |
@@ -171,11 +171,11 @@ Les 7 combinaisons RGB possibles sont toutes utilisées, sur toutes les notes de
 | PB6    | EXTI9_5 | 23  | `EXTI9_5_Handler` |
 | PB8    | EXTI9_5 | 23  | `EXTI9_5_Handler` |
 
-PB5, PB6 et PB8 tombent dans le même handler, qui lit `EXTI.PR` pour savoir quelle ligne a déclenché l'interruption.
+PB5, PB6 and PB8 share the same handler, which reads `EXTI.PR` to find which line triggered the interrupt.
 
-## Ajouter une mélodie
+## Adding a melody
 
-1. Écrire le tableau de notes dans `melodie.c` :
+1. Write the note array in `melodie.c` (note names follow the French convention: DO = C, MI = E, SOL = G):
 ```c
 const note_t melodie_ma_chanson[] = {
     {DO4,     DUR_QUARTER},
@@ -187,20 +187,20 @@ const uint32_t melodie_ma_chanson_size =
     sizeof(melodie_ma_chanson) / sizeof(note_t);
 ```
 
-2. Le déclarer dans `melodie.h` :
+2. Declare it in `melodie.h`:
 ```c
 extern const note_t   melodie_ma_chanson[];
 extern const uint32_t melodie_ma_chanson_size;
 ```
 
-3. L'ajouter au tableau `catalogue[]` de `player.c`, avec son tempo conseillé :
+3. Add it to the `catalogue[]` array in `player.c`, with its suggested tempo:
 ```c
 { "Ma Chanson", melodie_ma_chanson, &melodie_ma_chanson_size, 120 },
 ```
 
-## Réglages de GTKTerm
+## GTKTerm settings
 
-| Paramètre | Valeur                            |
+| Setting   | Value                             |
 |-----------|-----------------------------------|
-| Port      | /dev/ttyACM0 (ou COM sur Windows) |
+| Port      | /dev/ttyACM0 (or COM on Windows)  |
 | Baud rate | 9600                              |
